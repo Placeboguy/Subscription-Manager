@@ -1,0 +1,119 @@
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Sidebar from './Sidebar';
+import DashboardPage from '../pages/DashboardPage';
+import AllSubscriptionPage from '../pages/AllSubscriptionPage';
+import SettingsPage from '../pages/SettingsPage';
+import { IconMenu, IconX } from './icons';
+
+/**
+ * The main Layout container
+ * Wraps the Sidebar and the main content area.
+ * Handles mobile sidebar state and renders the current page.
+ */
+const Layout = ({ currentPage, setCurrentPage }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  // Determine content to render
+  let content;
+  switch (currentPage) {
+    case 'dashboard':
+      content = <DashboardPage />;
+      break;
+    case 'subscriptions':
+      content = <AllSubscriptionPage />;
+      break;
+    case 'settings':
+      content = <SettingsPage />;
+      break;
+    default:
+      content = <DashboardPage />;
+  }
+
+  return (
+    <div className="flex h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+      {/* 1. Desktop Sidebar (Permanent) */}
+      <div className="hidden md:flex">
+        <Sidebar
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
+      </div>
+
+      {/* 2. Mobile Sidebar (Conditional) */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            className="fixed inset-0 z-50 flex md:hidden"
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+          >
+            {/* Backdrop */}
+            <motion.div
+              className="fixed inset-0 bg-black/30"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={toggleMobileMenu}
+            ></motion.div>
+
+            {/* Sidebar itself */}
+            <div className="relative z-10">
+              <Sidebar
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+              />
+            </div>
+
+            {/* Close button */}
+            <button
+              onClick={toggleMobileMenu}
+              className="absolute top-4 right-4 z-20 p-2 text-white"
+            >
+              <IconX size={24} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 3. Main Content Area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Mobile Header */}
+        <div className="md:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+          <h1 className="text-xl font-bold text-primary-600 dark:text-primary-400">
+            SubManager
+          </h1>
+          <button
+            onClick={toggleMobileMenu}
+            className="p-2 text-gray-700 dark:text-gray-200"
+          >
+            <IconMenu size={24} />
+          </button>
+        </div>
+
+        {/* Content */}
+        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentPage} // Re-animate when page changes
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {content}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default Layout;
