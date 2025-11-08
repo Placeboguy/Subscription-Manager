@@ -1,0 +1,18 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="64" height="64" fill="#1e3a8a" rx="8"/>
+  
+  <!-- Wallet/Money Bag Icon -->
+  <g transform="translate(8, 10)">
+    <!-- Wallet body -->
+    <rect x="2" y="8" width="44" height="28" fill="#60a5fa" stroke="#1e40af" stroke-width="1.5" rx="3"/>
+    
+    <!-- Wallet flap -->
+    <path d="M 6 8 Q 6 2 12 2 L 40 2 Q 46 2 46 8" fill="#3b82f6" stroke="#1e40af" stroke-width="1.5"/>
+    
+    <!-- Coin accent -->
+    <circle cx="32" cy="22" r="7" fill="#fbbf24" opacity="0.8"/>
+    <circle cx="32" cy="22" r="6" fill="#fcd34d"/>
+    <text x="32" y="26" text-anchor="middle" font-size="10" font-weight="bold" fill="#1e40af">$</text>
+  </g>
+</svg>

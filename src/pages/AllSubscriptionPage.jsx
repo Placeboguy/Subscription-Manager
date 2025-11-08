@@ -4,6 +4,7 @@ import { useSubscriptions } from '../Context/SubscriptionContext';
 import SubscriptionCard from '../Component/SubscriptionCard';
 import AddSubscriptionModal from '../Component/AddSubscriptionModal';
 import { IconSearch, IconPlus, IconFilter } from '../Component/icons';
+import styles from './AllSubscriptionPage.module.css';
 
 /**
  * All Subscriptions Page
@@ -34,7 +35,7 @@ const AllSubscriptions = () => {
         </h1>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-lg shadow-md hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+          className={styles.addButton}
         >
           <IconPlus />
           Add Subscription
@@ -82,7 +83,7 @@ const AllSubscriptions = () => {
         >
           {filteredSubscriptions.length > 0 ? (
             filteredSubscriptions.map((sub) => (
-              <SubscriptionCard key={sub.id} subscription={sub} />
+              <SubscriptionCard key={sub._id} subscription={sub} />
             ))
           ) : (
             <motion.p

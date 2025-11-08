@@ -1,98 +1,154 @@
-import React, { createContext, useState, useContext } from 'react';
-
-// --- MOCK DATA ---
-const initialSubscriptions = [
-  {
-    id: '1',
-    name: 'Netflix',
-    cost: 15.99,
-    billingCycle: 'monthly',
-    startDate: '2025-01-10',
-    status: 'active',
-  },
-  {
-    id: '2',
-    name: 'Spotify Premium',
-    cost: 10.99,
-    billingCycle: 'monthly',
-    startDate: '2025-02-15',
-    status: 'active',
-  },
-  {
-    id: '3',
-    name: 'Adobe Creative Cloud',
-    cost: 59.99,
-    billingCycle: 'monthly',
-    startDate: '2025-01-20',
-    status: 'active',
-  },
-  {
-    id: '4',
-    name: 'Amazon Prime',
-    cost: 139.0,
-    billingCycle: 'yearly',
-    startDate: '2025-03-01',
-    status: 'active',
-  },
-  {
-    id: '5',
-    name: 'Old Gym Membership',
-    cost: 25.0,
-    billingCycle: 'monthly',
-    startDate: '2024-11-01',
-    status: 'expired',
-  },
-];
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { subscriptionAPI } from '../services/api';
 
 const SubscriptionContext = createContext();
 
 export const useSubscriptions = () => useContext(SubscriptionContext);
 
 export const SubscriptionProvider = ({ children }) => {
-  const [subscriptions, setSubscriptions] = useState(initialSubscriptions);
+  const [subscriptions, setSubscriptions] = useState([]);
+  const [stats, setStats] = useState({
+    totalActive: 0,
+    monthlySpending: 0,
+    yearlySpending: 0,
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const addSubscription = (sub) => {
-    const newSub = { ...sub, id: (Date.now() + Math.random()).toString() };
-    setSubscriptions([newSub, ...subscriptions]);
+  // Fetch subscriptions from backend
+  const fetchSubscriptions = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await subscriptionAPI.getAll();
+      if (result.success) {
+        setSubscriptions(result.data || []);
+      } else {
+        setError(result.message);
+        setSubscriptions([]);
+      }
+    } catch (err) {
+      setError(err.message);
+      setSubscriptions([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteSubscription = (id) => {
-    setSubscriptions(subscriptions.filter((sub) => sub.id !== id));
+  // Fetch stats from backend
+  const fetchStats = async () => {
+    try {
+      const result = await subscriptionAPI.getStats();
+      if (result.success) {
+        setStats(result.data || {});
+      }
+    } catch (err) {
+      console.error('Error fetching stats:', err);
+    }
   };
 
-  const getStats = () => {
-    const activeSubs = subscriptions.filter((s) => s.status === 'active');
-
-    const monthlyCost = activeSubs.reduce((acc, sub) => {
-      if (sub.billingCycle === 'monthly') {
-        return acc + sub.cost;
+  // Add subscription
+  const addSubscription = async (sub) => {
+    setLoading(true);
+    setError(null);
+    try {
+      console.log('Adding subscription:', sub);
+      const result = await subscriptionAPI.add(sub);
+      console.log('API response:', result);
+      
+      if (result.success && result.data) {
+        // Add the new subscription to the list
+        const newSubscriptions = [result.data, ...subscriptions];
+        console.log('Updated subscriptions:', newSubscriptions);
+        setSubscriptions(newSubscriptions);
+        await fetchStats();
+        return { success: true, data: result.data };
+      } else {
+        const errorMsg = result.message || 'Failed to add subscription';
+        setError(errorMsg);
+        return { success: false, message: errorMsg };
       }
-      if (sub.billingCycle === 'yearly') {
-        return acc + sub.cost / 12;
-      }
-      return acc;
-    }, 0);
-
-    const yearlyCost = activeSubs.reduce((acc, sub) => {
-      if (sub.billingCycle === 'monthly') {
-        return acc + sub.cost * 12;
-      }
-      if (sub.billingCycle === 'yearly') {
-        return acc + sub.cost;
-      }
-      return acc;
-    }, 0);
-
-    return {
-      totalActive: activeSubs.length,
-      monthlyCost: monthlyCost.toFixed(2),
-      yearlyCost: yearlyCost.toFixed(2),
-    };
+    } catch (err) {
+      console.error('Error in addSubscription:', err);
+      const errorMsg = err.message || 'An error occurred';
+      setError(errorMsg);
+      return { success: false, message: errorMsg };
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // Delete subscription
+  const deleteSubscription = async (id) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await subscriptionAPI.delete(id);
+      if (result.success) {
+        setSubscriptions(subscriptions.filter((sub) => sub._id !== id));
+        await fetchStats();
+        return { success: true };
+      } else {
+        setError(result.message);
+        return { success: false, message: result.message };
+      }
+    } catch (err) {
+      setError(err.message);
+      return { success: false, message: err.message };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update subscription
+  const updateSubscription = async (id, updates) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await subscriptionAPI.update(id, updates);
+      if (result.success) {
+        setSubscriptions(
+          subscriptions.map((sub) => (sub._id === id ? result.data : sub))
+        );
+        await fetchStats();
+        return { success: true, data: result.data };
+      } else {
+        setError(result.message);
+        return { success: false, message: result.message };
+      }
+    } catch (err) {
+      setError(err.message);
+      return { success: false, message: err.message };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Get stats
+  const getStats = () => stats;
+
+  // Initialize - fetch subscriptions when provider mounts and token exists
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      fetchSubscriptions();
+      fetchStats();
+    }
+  }, []);
 
   return (
     <SubscriptionContext.Provider
-      value={{ subscriptions, addSubscription, deleteSubscription, getStats }}
+      value={{
+        subscriptions,
+        addSubscription,
+        deleteSubscription,
+        updateSubscription,
+        getStats,
+        fetchSubscriptions,
+        fetchStats,
+        loading,
+        error,
+      }}
     >
       {children}
     </SubscriptionContext.Provider>

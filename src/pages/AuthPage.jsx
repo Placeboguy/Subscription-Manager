@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import GradientBlinds from '../Component/GradientBlinds';
+import { authAPI } from '../services/api';
 
 // --- INLINE ICONS ---
-// I've moved the icons directly into this file to fix the import error.
-
 const IconMail = ({ size = 16, className = '' }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -76,109 +76,195 @@ const IconMoneyBillWave = ({ size = 32, className = '' }) => (
  */
 const AuthPage = ({ onLogin }) => {
   const [isLoginView, setIsLoginView] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
 
-  const handleSubmit = (e) => {
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    setError(''); // Clear error when user starts typing
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // In a real app, you'd verify credentials here
-    // For this demo, we'll just log in successfully
-    onLogin();
+    setLoading(true);
+    setError('');
+
+    try {
+      let result;
+
+      if (isLoginView) {
+        // Login
+        result = await authAPI.login(formData.email, formData.password);
+      } else {
+        // Sign up
+        if (!formData.name.trim()) {
+          setError('Name is required');
+          setLoading(false);
+          return;
+        }
+        result = await authAPI.register(formData.name, formData.email, formData.password);
+      }
+
+      if (result.success) {
+        onLogin();
+      } else {
+        setError(result.message || 'Authentication failed');
+      }
+    } catch (err) {
+      setError(err.message || 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
-      >
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8">
-          <div className="flex items-center justify-center space-x-2 mb-8">
-            <IconMoneyBillWave
-              size={32}
-              className="text-3xl text-primary-600 dark:text-primary-400"
-            />
-            <span className="text-2xl font-bold text-gray-800 dark:text-white">
-              SubManager
-            </span>
-          </div>
+    <div className="relative flex items-center justify-center min-h-screen bg-black text-white p-4 overflow-hidden">
+      {/* GradientBlinds Background */}
+      <div className="absolute inset-0 z-0 w-full h-full">
+        <GradientBlinds
+          gradientColors={['#FF9FFC', '#5227FF']}
+          angle={-45}
+          noise={0.3}
+          blindCount={12}
+          blindMinWidth={50}
+          spotlightRadius={0.5}
+          spotlightSoftness={1}
+          spotlightOpacity={0.8}
+          mouseDampening={0.15}
+          distortAmount={0}
+          shineDirection="left"
+          mixBlendMode="lighten"
+        />
+      </div>
 
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={isLoginView ? 'login' : 'signup'}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.2 }}
-            >
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <h2 className="text-2xl font-bold text-center mb-4">
-                  {isLoginView ? 'Log In' : 'Create Account'}
-                </h2>
+      {/* Content */}
+      <div className="relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-md"
+        >
+          <div className="bg-black bg-opacity-50 border border-white border-opacity-10 rounded-xl shadow-2xl p-8 backdrop-blur-sm">
+            <div className="flex items-center justify-center space-x-2 mb-8">
+              <IconMoneyBillWave
+                size={32}
+                className="text-3xl text-white"
+              />
+              <span className="text-2xl font-bold text-white">
+                SubManager
+              </span>
+            </div>
 
-                {!isLoginView && (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={isLoginView ? 'login' : 'signup'}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <h2 className="text-2xl font-bold text-center mb-4">
+                    {isLoginView ? 'Log In' : 'Create Account'}
+                  </h2>
+
+                  {error && (
+                    <div className="p-3 bg-red-500 bg-opacity-20 border border-red-500 border-opacity-50 text-red-300 rounded-lg text-sm">
+                      {error}
+                    </div>
+                  )}
+
+                  {!isLoginView && (
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+                        <IconUser />
+                      </span>
+                      <input
+                        type="text"
+                        name="name"
+                        placeholder="Full Name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        required
+                        disabled={loading}
+                        className="w-full pl-10 pr-4 py-2.5 border border-white border-opacity-20 bg-black bg-opacity-30 text-white placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                      />
+                    </div>
+                  )}
+
                   <div className="relative">
                     <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
-                      <IconUser />
+                      <IconMail />
                     </span>
                     <input
-                      type="text"
-                      placeholder="Username"
+                      type="email"
+                      name="email"
+                      placeholder="Email"
+                      value={formData.email}
+                      onChange={handleInputChange}
                       required
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      disabled={loading}
+                      className="w-full pl-10 pr-4 py-2.5 border border-white border-opacity-20 bg-black bg-opacity-30 text-white placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                     />
                   </div>
-                )}
 
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
-                    <IconMail />
-                  </span>
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    required
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                </div>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+                      <IconLock />
+                    </span>
+                    <input
+                      type="password"
+                      name="password"
+                      placeholder="Password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      required
+                      disabled={loading}
+                      className="w-full pl-10 pr-4 py-2.5 border border-white border-opacity-20 bg-black bg-opacity-30 text-white placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                    />
+                  </div>
 
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
-                    <IconLock />
-                  </span>
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    required
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                </div>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full px-5 py-3 text-base font-bold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? 'Loading...' : (isLoginView ? 'Log In' : 'Sign Up')}
+                  </button>
+                </form>
+              </motion.div>
+            </AnimatePresence>
 
-                <button
-                  type="submit"
-                  className="w-full px-5 py-3 text-base font-bold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  {isLoginView ? 'Log In' : 'Sign Up'}
-                </button>
-              </form>
-            </motion.div>
-          </AnimatePresence>
-
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => setIsLoginView(!isLoginView)}
-              className="text-sm text-primary-600 dark:text-primary-400 hover:underline"
-            >
-              {isLoginView
-                ? 'Need an account? Sign Up'
-                : 'Already have an account? Log In'}
-            </button>
+            <div className="mt-6 text-center">
+              <button
+                onClick={() => {
+                  setIsLoginView(!isLoginView);
+                  setError('');
+                  setFormData({ name: '', email: '', password: '' });
+                }}
+                disabled={loading}
+                className="text-sm text-blue-400 hover:text-blue-300 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoginView
+                  ? 'Need an account? Sign Up'
+                  : 'Already have an account? Log In'}
+              </button>
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </div>
   );
 };
 
 export default AuthPage;
-

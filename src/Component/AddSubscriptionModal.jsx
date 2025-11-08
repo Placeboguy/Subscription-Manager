@@ -9,29 +9,51 @@ import { IconX, IconAlertCircle } from './icons';
 const AddSubscriptionModal = ({ onClose }) => {
   const { addSubscription } = useSubscriptions();
   const [name, setName] = useState('');
-  const [cost, setCost] = useState('');
-  const [billingCycle, setBillingCycle] = useState('monthly');
-  const [startDate, setStartDate] = useState(
-    new Date().toISOString().split('T')[0]
-  ); // YYYY-MM-DD
-  const [status, setStatus] = useState('active');
+  const [price, setPrice] = useState('');
+  const [frequency, setFrequency] = useState('monthly');
+  const [category, setCategory] = useState('Entertainment');
+  const [description, setDescription] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name || !cost) {
-      setError('Subscription Name and Cost are required.');
+    if (!name || !price) {
+      setError('Subscription Name and Price are required.');
       return;
     }
     setError('');
-    addSubscription({
-      name,
-      cost: parseFloat(cost),
-      billingCycle,
-      startDate,
-      status,
-    });
-    onClose();
+    setLoading(true);
+    
+    try {
+      const subscriptionData = {
+        name,
+        price: parseFloat(price),
+        frequency,
+        category,
+        description,
+      };
+      
+      console.log('Submitting subscription:', subscriptionData);
+      
+      const result = await addSubscription(subscriptionData);
+      
+      console.log('Add subscription result:', result);
+      
+      setLoading(false);
+      
+      if (result.success) {
+        console.log('Subscription added successfully');
+        onClose();
+      } else {
+        console.error('Failed to add subscription:', result.message);
+        setError(result.message || 'Failed to add subscription');
+      }
+    } catch (err) {
+      console.error('Error submitting subscription:', err);
+      setLoading(false);
+      setError(err.message || 'An error occurred while adding the subscription');
+    }
   };
 
   // Modal backdrop variant
@@ -99,38 +121,40 @@ const AddSubscriptionModal = ({ onClose }) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              placeholder="e.g., Netflix"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label
-                htmlFor="cost"
+                htmlFor="price"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
               >
-                Cost
+                Price ($)
               </label>
               <input
                 type="number"
-                id="cost"
+                id="price"
                 step="0.01"
                 min="0"
-                value={cost}
-                onChange={(e) => setCost(e.target.value)}
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="9.99"
               />
             </div>
             <div>
               <label
-                htmlFor="billingCycle"
+                htmlFor="frequency"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
               >
-                Billing Cycle
+                Billing Frequency
               </label>
               <select
-                id="billingCycle"
-                value={billingCycle}
-                onChange={(e) => setBillingCycle(e.target.value)}
+                id="frequency"
+                value={frequency}
+                onChange={(e) => setFrequency(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="monthly">Monthly</option>
@@ -139,39 +163,43 @@ const AddSubscriptionModal = ({ onClose }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label
-                htmlFor="startDate"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Start Date
-              </label>
-              <input
-                type="date"
-                id="startDate"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="status"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Status
-              </label>
-              <select
-                id="status"
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="active">Active</option>
-                <option value="expired">Expired</option>
-              </select>
-            </div>
+          <div>
+            <label
+              htmlFor="category"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Category
+            </label>
+            <select
+              id="category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="Entertainment">Entertainment</option>
+              <option value="Productivity">Productivity</option>
+              <option value="Fitness">Fitness</option>
+              <option value="Education">Education</option>
+              <option value="Streaming">Streaming</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Description (Optional)
+            </label>
+            <textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+              placeholder="Add any notes..."
+              rows="3"
+            />
           </div>
 
           <div className="flex justify-end pt-4 space-x-2">
@@ -184,9 +212,10 @@ const AddSubscriptionModal = ({ onClose }) => {
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg shadow-md hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              disabled={loading}
+              className="px-5 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg shadow-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
             >
-              Save Subscription
+              {loading ? 'Saving...' : 'Save Subscription'}
             </button>
           </div>
         </form>

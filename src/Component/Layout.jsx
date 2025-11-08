@@ -11,7 +11,7 @@ import { IconMenu, IconX } from './icons';
  * Wraps the Sidebar and the main content area.
  * Handles mobile sidebar state and renders the current page.
  */
-const Layout = ({ currentPage, setCurrentPage }) => {
+const Layout = ({ currentPage, setCurrentPage, onLogout }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => {
@@ -41,6 +41,7 @@ const Layout = ({ currentPage, setCurrentPage }) => {
         <Sidebar
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
+          onLogout={onLogout}
         />
       </div>
 
@@ -68,6 +69,7 @@ const Layout = ({ currentPage, setCurrentPage }) => {
               <Sidebar
                 currentPage={currentPage}
                 setCurrentPage={setCurrentPage}
+                onLogout={onLogout}
               />
             </div>
 

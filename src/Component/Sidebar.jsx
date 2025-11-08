@@ -131,19 +131,47 @@ const NavItem = ({
  * User Profile for Sidebar
  */
 const UserProfile = () => {
+  // Get user info from localStorage
+  const userInfo = localStorage.getItem('userInfo');
+  let user = { name: 'User', email: 'user@example.com' };
+  
+  if (userInfo) {
+    try {
+      user = JSON.parse(userInfo);
+    } catch (err) {
+      console.error('Error parsing user info:', err);
+    }
+  }
+
+  // Generate initials for avatar
+  const initials = user.name
+    ? user.name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+    : 'U';
+
+  // Generate a consistent color based on user name
+  const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+  const colorIndex = user.name ? user.name.charCodeAt(0) % colors.length : 0;
+  const bgColor = colors[colorIndex];
+
   return (
     <div className="flex items-center space-x-3 p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-      <img
-        className="w-10 h-10 rounded-full object-cover"
-        src="https://placehold.co/40x40/3b82f6/ffffff?text=JD"
-        alt="User avatar"
-      />
+      <div
+        className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+        style={{ backgroundColor: bgColor }}
+        title={user.name}
+      >
+        {initials}
+      </div>
       <div>
         <h4 className="font-semibold text-sm text-gray-800 dark:text-white">
-          John Doe
+          {user.name}
         </h4>
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          john.doe@example.com
+          {user.email}
         </p>
       </div>
     </div>
@@ -156,7 +184,7 @@ const UserProfile = () => {
 /**
  * The Sidebar
  */
-const Sidebar = ({ currentPage, setCurrentPage }) => {
+const Sidebar = ({ currentPage, setCurrentPage, onLogout }) => {
   return (
     <aside className="w-64 flex-shrink-0 bg-white dark:bg-gray-800 p-4 h-full flex flex-col justify-between shadow-lg border-r border-gray-200 dark:border-gray-700">
       {/* Top Section: Logo + Nav */}
@@ -204,7 +232,9 @@ const Sidebar = ({ currentPage, setCurrentPage }) => {
       {/* Bottom Section: User Profile + Logout */}
       <div className="space-y-4">
         <UserProfile />
-        <button className="flex w-full items-center space-x-3 px-4 py-2.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-800 hover:text-red-600 dark:hover:text-red-300 transition-all duration-200">
+        <button 
+          onClick={onLogout}
+          className="flex w-full items-center space-x-3 px-4 py-2.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-800 hover:text-red-600 dark:hover:text-red-300 transition-all duration-200">
           <IconLogOut size={20} />
           <span className="font-medium">Logout</span>
         </button>
