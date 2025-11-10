@@ -12,11 +12,6 @@ import {
 import { useSubscriptions } from '../Context/SubscriptionContext';
 import { subscriptionAPI } from '../services/api';
 import StatCard from '../Component/StatCard';
-import {
-  IconCheckCircle,
-  IconTrendingUp,
-  IconPieChart,
-} from '../Component/icons';
 
 /**
  * Dashboard Page
@@ -68,19 +63,19 @@ const Dashboard = () => {
         <StatCard
           title="Total Active"
           value={totalActive}
-          icon={<IconCheckCircle size={26} className="text-green-600" />}
+          icon="✓"
           color="bg-green-100 dark:bg-green-900/50"
         />
         <StatCard
           title="Monthly Spending"
           value={`$${monthlySpending.toFixed(2)}`}
-          icon={<IconTrendingUp size={26} className="text-blue-600" />}
+          icon="📈"
           color="bg-blue-100 dark:bg-blue-900/50"
         />
         <StatCard
           title="Yearly Spending"
           value={`$${yearlySpending.toFixed(2)}`}
-          icon={<IconPieChart size={26} className="text-purple-600" />}
+          icon="📊"
           color="bg-purple-100 dark:bg-purple-900/50"
         />
       </div>

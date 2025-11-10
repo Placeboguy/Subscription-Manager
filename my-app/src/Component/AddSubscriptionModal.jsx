@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useSubscriptions } from '../Context/SubscriptionContext';
-import { IconX, IconAlertCircle } from './icons';
 
 /**
  * Add Subscription Modal
@@ -93,15 +92,15 @@ const AddSubscriptionModal = ({ onClose }) => {
           </h2>
           <button
             onClick={onClose}
-            className="p-1 rounded-full text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
+            className="p-1 rounded-full text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 text-2xl font-bold"
           >
-            <IconX size={24} />
+            ✕
           </button>
         </div>
 
         {error && (
           <div className="mb-4 p-3 rounded-lg bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 flex items-center space-x-2">
-            <IconAlertCircle />
+            <span className="text-xl">⚠</span>
             <span>{error}</span>
           </div>
         )}

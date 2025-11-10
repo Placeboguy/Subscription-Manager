@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from './Sidebar';
 import DashboardPage from '../pages/DashboardPage';
 import AllSubscriptionPage from '../pages/AllSubscriptionPage';
-import { IconMenu, IconX } from './icons';
 
 /**
  * The main Layout container
@@ -72,9 +71,9 @@ const Layout = ({ currentPage, setCurrentPage, onLogout }) => {
             {/* Close button */}
             <button
               onClick={toggleMobileMenu}
-              className="absolute top-4 right-4 z-20 p-2 text-white"
+              className="absolute top-4 right-4 z-20 p-2 text-white text-2xl font-bold"
             >
-              <IconX size={24} />
+              ✕
             </button>
           </motion.div>
         )}
@@ -89,9 +88,9 @@ const Layout = ({ currentPage, setCurrentPage, onLogout }) => {
           </h1>
           <button
             onClick={toggleMobileMenu}
-            className="p-2 text-gray-700 dark:text-gray-200"
+            className="p-2 text-gray-700 dark:text-gray-200 text-2xl font-bold"
           >
-            <IconMenu size={24} />
+            ☰
           </button>
         </div>
 

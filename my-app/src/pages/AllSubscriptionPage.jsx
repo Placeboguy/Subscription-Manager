@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSubscriptions } from '../Context/SubscriptionContext';
 import SubscriptionCard from '../Component/SubscriptionCard';
 import AddSubscriptionModal from '../Component/AddSubscriptionModal';
-import { IconSearch, IconPlus, IconFilter } from '../Component/icons';
 import styles from './AllSubscriptionPage.module.css';
 
 /**
@@ -37,8 +36,7 @@ const AllSubscriptions = () => {
           onClick={() => setIsModalOpen(true)}
           className={styles.addButton}
         >
-          <IconPlus />
-          Add Subscription
+          ＋ Add Subscription
         </button>
       </div>
 
@@ -47,7 +45,7 @@ const AllSubscriptions = () => {
         {/* Search Bar */}
         <div className="relative flex-1">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
-            <IconSearch />
+            🔍
           </span>
           <input
             type="text"
@@ -61,7 +59,7 @@ const AllSubscriptions = () => {
         {/* Filter Dropdown */}
         <div className="relative">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
-            <IconFilter />
+            ⋮
           </span>
           <select
             value={filter}
