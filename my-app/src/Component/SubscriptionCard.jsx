@@ -47,7 +47,7 @@ const SubscriptionCard = ({ subscription }) => {
           </div>
           <div className="mb-4">
             <p className="text-3xl font-extrabold text-gray-900 dark:text-white">
-              ${subscription.price.toFixed(2)}
+              ₹{subscription.price.toFixed(2)}
               <span className="text-base font-medium text-gray-500 dark:text-gray-400">
                 /{subscription.frequency}
               </span>

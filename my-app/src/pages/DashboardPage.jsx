@@ -68,13 +68,13 @@ const Dashboard = () => {
         />
         <StatCard
           title="Monthly Spending"
-          value={`$${monthlySpending.toFixed(2)}`}
+          value={`₹${monthlySpending.toFixed(2)}`}
           icon="📈"
           color="bg-blue-100 dark:bg-blue-900/50"
         />
         <StatCard
           title="Yearly Spending"
-          value={`$${yearlySpending.toFixed(2)}`}
+          value={`₹${yearlySpending.toFixed(2)}`}
           icon="📊"
           color="bg-purple-100 dark:bg-purple-900/50"
         />
@@ -99,7 +99,7 @@ const Dashboard = () => {
                       {sub.name}
                     </p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      ${sub.price?.toFixed(2) || '0.00'} / {sub.frequency}
+                      ₹{sub.price?.toFixed(2) || '0.00'} / {sub.frequency}
                     </p>
                   </div>
                   <span
@@ -144,7 +144,7 @@ const Dashboard = () => {
                   itemStyle={{
                     color: '#e5e7eb',
                   }}
-                  formatter={(value) => `$${value.toFixed(2)}`}
+                  formatter={(value) => `₹${value.toFixed(2)}`}
                 />
                 <Legend />
                 <Bar
