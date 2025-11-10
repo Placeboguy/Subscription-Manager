@@ -1,146 +1,10 @@
 const API_BASE_URL = 'http://localhost:5000/api';
 
-// Helper function to get auth token
-export const getAuthToken = () => {
-  return localStorage.getItem('authToken');
-};
-
-// Helper function to set auth token
-export const setAuthToken = (token) => {
-  localStorage.setItem('authToken', token);
-};
-
-// Helper function to clear auth token
-export const clearAuthToken = () => {
-  localStorage.removeItem('authToken');
-};
-
-// Helper function to get user info
-export const getUserInfo = () => {
-  const userStr = localStorage.getItem('userInfo');
-  return userStr ? JSON.parse(userStr) : null;
-};
-
-// Helper function to set user info
-export const setUserInfo = (user) => {
-  localStorage.setItem('userInfo', JSON.stringify(user));
-};
-
-// Helper function to clear user info
-export const clearUserInfo = () => {
-  localStorage.removeItem('userInfo');
-};
-
-// Create headers without auth token (public access)
+// Create headers for API requests
 const getHeaders = () => {
   return {
     'Content-Type': 'application/json',
   };
-};
-
-// ==================== AUTH ENDPOINTS ====================
-
-export const authAPI = {
-  // Register a new user
-  register: async (name, email, password) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, password }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setAuthToken(data.token);
-        setUserInfo(data.user);
-      }
-
-      return data;
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message,
-      };
-    }
-  },
-
-  // Login user
-  login: async (email, password) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setAuthToken(data.token);
-        setUserInfo(data.user);
-      }
-
-      return data;
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message,
-      };
-    }
-  },
-
-  // Get current user
-  getMe: async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/me`, {
-        method: 'GET',
-        headers: getHeaders(),
-      });
-
-      return await response.json();
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message,
-      };
-    }
-  },
-
-  // Update user profile
-  updateProfile: async (name) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/profile`, {
-        method: 'PUT',
-        headers: getHeaders(),
-        body: JSON.stringify({ name }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setUserInfo(data.data);
-      }
-
-      return data;
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message,
-      };
-    }
-  },
-
-  // Logout user
-  logout: () => {
-    clearAuthToken();
-    clearUserInfo();
-  },
 };
 
 // ==================== SUBSCRIPTION ENDPOINTS ====================
@@ -289,7 +153,4 @@ export const subscriptionAPI = {
   },
 };
 
-export default {
-  authAPI,
-  subscriptionAPI,
-};
+export default subscriptionAPI;
