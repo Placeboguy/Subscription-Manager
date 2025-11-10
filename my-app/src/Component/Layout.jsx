@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from './Sidebar';
 import DashboardPage from '../pages/DashboardPage';
 import AllSubscriptionPage from '../pages/AllSubscriptionPage';
-import SettingsPage from '../pages/SettingsPage';
 import { IconMenu, IconX } from './icons';
 
 /**
@@ -26,9 +25,6 @@ const Layout = ({ currentPage, setCurrentPage, onLogout }) => {
       break;
     case 'subscriptions':
       content = <AllSubscriptionPage />;
-      break;
-    case 'settings':
-      content = <SettingsPage />;
       break;
     default:
       content = <DashboardPage />;

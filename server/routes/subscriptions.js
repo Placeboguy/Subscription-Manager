@@ -9,13 +9,10 @@ import {
   getMonthlyChartData,
   getYearlyChartData,
 } from '../controllers/subscriptionController.js';
-import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// All subscription routes require authentication
-router.use(protect);
-
+// No authentication required - using default userId
 router.get('/', getSubscriptions);
 router.post('/', addSubscription);
 router.get('/stats/overview', getStats);

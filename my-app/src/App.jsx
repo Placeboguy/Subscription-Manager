@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { SubscriptionProvider } from './Context/SubscriptionContext';
 import Layout from './Component/Layout';
-import AuthPage from './pages/AuthPage';
 import ErrorBoundary from './Component/ErrorBoundary';
 import NotificationCenter from './Component/NotificationCenter';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentPage, setCurrentPage] = useState('dashboard');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Force dark mode on mount
   useEffect(() => {
@@ -16,24 +14,7 @@ function App() {
     document.documentElement.style.colorScheme = 'dark';
   }, []);
 
-  // Check if user is already logged in on mount
-  useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    const userInfo = localStorage.getItem('userInfo');
-    if (token && userInfo) {
-      setIsLoggedIn(true);
-    }
-    setLoading(false);
-  }, []);
-
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
-
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userInfo');
-    setIsLoggedIn(false);
     setCurrentPage('dashboard');
   };
 
@@ -45,21 +26,18 @@ function App() {
     );
   }
 
+  // Always show dashboard - no login required
   return (
     <ErrorBoundary>
       <SubscriptionProvider>
-        {isLoggedIn ? (
-          <>
-            <Layout
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-              onLogout={handleLogout}
-            />
-            <NotificationCenter />
-          </>
-        ) : (
-          <AuthPage onLogin={handleLogin} />
-        )}
+        <>
+          <Layout
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            onLogout={handleLogout}
+          />
+          <NotificationCenter />
+        </>
       </SubscriptionProvider>
     </ErrorBoundary>
   );

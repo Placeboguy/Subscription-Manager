@@ -41,24 +41,6 @@ const IconGrid = ({ size = 20, className = '' }) => (
   </svg>
 );
 
-const IconSettings = ({ size = 20, className = '' }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <circle cx="12" cy="12" r="3"></circle>
-    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-  </svg>
-);
-
 const IconLogOut = ({ size = 20, className = '' }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -131,51 +113,7 @@ const NavItem = ({
  * User Profile for Sidebar
  */
 const UserProfile = () => {
-  // Get user info from localStorage
-  const userInfo = localStorage.getItem('userInfo');
-  let user = { name: 'User', email: 'user@example.com' };
-  
-  if (userInfo) {
-    try {
-      user = JSON.parse(userInfo);
-    } catch (err) {
-      console.error('Error parsing user info:', err);
-    }
-  }
-
-  // Generate initials for avatar
-  const initials = user.name
-    ? user.name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-    : 'U';
-
-  // Generate a consistent color based on user name
-  const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
-  const colorIndex = user.name ? user.name.charCodeAt(0) % colors.length : 0;
-  const bgColor = colors[colorIndex];
-
-  return (
-    <div className="flex items-center space-x-3 p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-      <div
-        className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
-        style={{ backgroundColor: bgColor }}
-        title={user.name}
-      >
-        {initials}
-      </div>
-      <div>
-        <h4 className="font-semibold text-sm text-gray-800 dark:text-white">
-          {user.name}
-        </h4>
-        <p className="text-xs text-gray-500 dark:text-gray-400">
-          {user.email}
-        </p>
-      </div>
-    </div>
-  );
+  return null; // No user profile in public mode
 };
 
 // --- ORIGINAL SIDEBAR COMPONENT ---
@@ -218,26 +156,12 @@ const Sidebar = ({ currentPage, setCurrentPage, onLogout }) => {
           >
             All Subscriptions
           </NavItem>
-          <NavItem
-            to="settings"
-            icon={<IconSettings size={20} />}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-          >
-            Settings
-          </NavItem>
         </nav>
       </div>
 
       {/* Bottom Section: User Profile + Logout */}
       <div className="space-y-4">
-        <UserProfile />
-        <button 
-          onClick={onLogout}
-          className="flex w-full items-center space-x-3 px-4 py-2.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-800 hover:text-red-600 dark:hover:text-red-300 transition-all duration-200">
-          <IconLogOut size={20} />
-          <span className="font-medium">Logout</span>
-        </button>
+        {/* Logo kept simple - no user profile or logout in public mode */}
       </div>
     </aside>
   );

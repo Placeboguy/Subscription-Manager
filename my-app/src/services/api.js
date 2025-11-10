@@ -31,12 +31,10 @@ export const clearUserInfo = () => {
   localStorage.removeItem('userInfo');
 };
 
-// Create headers with auth token
+// Create headers without auth token (public access)
 const getHeaders = () => {
-  const token = getAuthToken();
   return {
     'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
   };
 };
 

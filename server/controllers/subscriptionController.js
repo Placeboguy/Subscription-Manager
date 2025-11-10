@@ -1,11 +1,20 @@
 import Subscription from '../models/Subscription.js';
 
+// Default userId for public access (no authentication)
+const DEFAULT_USER_ID = '507f1f77bcf86cd799439011';
+
+// Helper to get userId from request or use default
+const getUserId = (req) => {
+  return req.user?.id || DEFAULT_USER_ID;
+};
+
 // @desc    Get all subscriptions for logged in user
 // @route   GET /api/subscriptions
-// @access  Private
+// @access  Public
 export const getSubscriptions = async (req, res) => {
   try {
-    const subscriptions = await Subscription.find({ userId: req.user.id }).sort({
+    const userId = getUserId(req);
+    const subscriptions = await Subscription.find({ userId }).sort({
       createdAt: -1,
     });
 
@@ -24,7 +33,7 @@ export const getSubscriptions = async (req, res) => {
 
 // @desc    Get single subscription
 // @route   GET /api/subscriptions/:id
-// @access  Private
+// @access  Public
 export const getSubscription = async (req, res) => {
   try {
     const subscription = await Subscription.findById(req.params.id);
@@ -36,8 +45,9 @@ export const getSubscription = async (req, res) => {
       });
     }
 
+    const userId = getUserId(req);
     // Check if user owns this subscription
-    if (subscription.userId.toString() !== req.user.id) {
+    if (subscription.userId.toString() !== userId) {
       return res.status(403).json({
         success: false,
         message: 'Not authorized to access this subscription',
@@ -58,7 +68,7 @@ export const getSubscription = async (req, res) => {
 
 // @desc    Add subscription
 // @route   POST /api/subscriptions
-// @access  Private
+// @access  Public
 export const addSubscription = async (req, res) => {
   try {
     const { name, category, price, frequency, description } = req.body;
@@ -71,8 +81,9 @@ export const addSubscription = async (req, res) => {
       });
     }
 
+    const userId = getUserId(req);
     const subscription = await Subscription.create({
-      userId: req.user.id,
+      userId,
       name,
       category,
       price,
@@ -95,7 +106,7 @@ export const addSubscription = async (req, res) => {
 
 // @desc    Update subscription
 // @route   PUT /api/subscriptions/:id
-// @access  Private
+// @access  Public
 export const updateSubscription = async (req, res) => {
   try {
     let subscription = await Subscription.findById(req.params.id);
@@ -107,8 +118,9 @@ export const updateSubscription = async (req, res) => {
       });
     }
 
+    const userId = getUserId(req);
     // Check if user owns this subscription
-    if (subscription.userId.toString() !== req.user.id) {
+    if (subscription.userId.toString() !== userId) {
       return res.status(403).json({
         success: false,
         message: 'Not authorized to update this subscription',
@@ -135,7 +147,7 @@ export const updateSubscription = async (req, res) => {
 
 // @desc    Delete subscription
 // @route   DELETE /api/subscriptions/:id
-// @access  Private
+// @access  Public
 export const deleteSubscription = async (req, res) => {
   try {
     const subscription = await Subscription.findById(req.params.id);
@@ -147,8 +159,9 @@ export const deleteSubscription = async (req, res) => {
       });
     }
 
+    const userId = getUserId(req);
     // Check if user owns this subscription
-    if (subscription.userId.toString() !== req.user.id) {
+    if (subscription.userId.toString() !== userId) {
       return res.status(403).json({
         success: false,
         message: 'Not authorized to delete this subscription',
@@ -171,10 +184,11 @@ export const deleteSubscription = async (req, res) => {
 
 // @desc    Get subscription stats for logged in user
 // @route   GET /api/subscriptions/stats/overview
-// @access  Private
+// @access  Public
 export const getStats = async (req, res) => {
   try {
-    const subscriptions = await Subscription.find({ userId: req.user.id });
+    const userId = getUserId(req);
+    const subscriptions = await Subscription.find({ userId });
 
     const activeSubscriptions = subscriptions.filter((sub) => sub.status === 'active').length;
     const monthlyTotal = subscriptions
@@ -204,10 +218,11 @@ export const getStats = async (req, res) => {
 
 // @desc    Get monthly spending chart data for logged in user
 // @route   GET /api/subscriptions/stats/monthly-chart
-// @access  Private
+// @access  Public
 export const getMonthlyChartData = async (req, res) => {
   try {
-    const subscriptions = await Subscription.find({ userId: req.user.id });
+    const userId = getUserId(req);
+    const subscriptions = await Subscription.find({ userId });
 
     // Get current date
     const today = new Date();
@@ -265,10 +280,11 @@ export const getMonthlyChartData = async (req, res) => {
 
 // @desc    Get yearly spending chart data for logged in user
 // @route   GET /api/subscriptions/stats/yearly-chart
-// @access  Private
+// @access  Public
 export const getYearlyChartData = async (req, res) => {
   try {
-    const subscriptions = await Subscription.find({ userId: req.user.id });
+    const userId = getUserId(req);
+    const subscriptions = await Subscription.find({ userId });
 
     // Get current date
     const today = new Date();
