@@ -1,35 +1,10 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 
 /**
  * Reusable NavLink component for the Sidebar
  */
-const NavItem = ({
-  to,
-  children,
-  currentPage,
-  setCurrentPage,
-}) => {
-  const isActive = currentPage === to;
-  const baseClasses =
-    'px-4 py-2.5 rounded-lg transition-all duration-200 w-full text-left';
-  const hoverClasses =
-    'hover:bg-primary-500 hover:text-white dark:hover:bg-primary-600';
-  const activeClasses =
-    'bg-primary-100 dark:bg-gray-700 text-primary-700 dark:text-primary-300 font-semibold shadow-inner';
-
-  return (
-    <button
-      onClick={() => setCurrentPage(to)}
-      className={`${baseClasses} ${
-        isActive
-          ? activeClasses
-          : 'text-gray-600 dark:text-gray-300 ' + hoverClasses
-      }`}
-    >
-      <span className="font-medium">{children}</span>
-    </button>
-  );
-};
+// Nav items use react-router NavLink for route-aware active styling
 
 /**
  * User Profile for Sidebar
@@ -44,7 +19,7 @@ const UserProfile = () => {
 /**
  * The Sidebar
  */
-const Sidebar = ({ currentPage, setCurrentPage, onLogout }) => {
+const Sidebar = () => {
   return (
     <aside className="w-64 flex-shrink-0 bg-white dark:bg-gray-800 p-4 h-full flex flex-col justify-between shadow-lg border-r border-gray-200 dark:border-gray-700">
       {/* Top Section: Logo + Nav */}
@@ -58,20 +33,31 @@ const Sidebar = ({ currentPage, setCurrentPage, onLogout }) => {
 
         {/* Navigation */}
         <nav className="space-y-2">
-          <NavItem
-            to="dashboard"
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) =>
+              `flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all duration-200 w-full text-left ${
+                isActive
+                  ? 'bg-primary-100 dark:bg-gray-700 text-primary-700 dark:text-primary-300 font-semibold shadow-inner'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-600'
+              }`
+            }
           >
-            Dashboard
-          </NavItem>
-          <NavItem
-            to="subscriptions"
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
+            <span className="font-medium">Dashboard</span>
+          </NavLink>
+          <NavLink
+            to="/subscriptions"
+            className={({ isActive }) =>
+              `flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all duration-200 w-full text-left ${
+                isActive
+                  ? 'bg-primary-100 dark:bg-gray-700 text-primary-700 dark:text-primary-300 font-semibold shadow-inner'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-600'
+              }`
+            }
           >
-            All Subscriptions
-          </NavItem>
+            <span className="font-medium">All Subscriptions</span>
+          </NavLink>
         </nav>
       </div>
 

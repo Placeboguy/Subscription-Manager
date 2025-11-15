@@ -1,43 +1,28 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from './Sidebar';
-import DashboardPage from '../pages/DashboardPage';
-import AllSubscriptionPage from '../pages/AllSubscriptionPage';
+import { Outlet, useLocation } from 'react-router-dom';
 
 /**
  * The main Layout container
  * Wraps the Sidebar and the main content area.
  * Handles mobile sidebar state and renders the current page.
  */
-const Layout = ({ currentPage, setCurrentPage, onLogout }) => {
+const Layout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  // Determine content to render
-  let content;
-  switch (currentPage) {
-    case 'dashboard':
-      content = <DashboardPage />;
-      break;
-    case 'subscriptions':
-      content = <AllSubscriptionPage />;
-      break;
-    default:
-      content = <DashboardPage />;
-  }
+  // Content is rendered by child routes via <Outlet />
 
   return (
     <div className="flex h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
       {/* 1. Desktop Sidebar (Permanent) */}
       <div className="hidden md:flex">
-        <Sidebar
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          onLogout={onLogout}
-        />
+        <Sidebar />
       </div>
 
       {/* 2. Mobile Sidebar (Conditional) */}
@@ -61,11 +46,7 @@ const Layout = ({ currentPage, setCurrentPage, onLogout }) => {
 
             {/* Sidebar itself */}
             <div className="relative z-10">
-              <Sidebar
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
-                onLogout={onLogout}
-              />
+              <Sidebar />
             </div>
 
             {/* Close button */}
@@ -98,13 +79,13 @@ const Layout = ({ currentPage, setCurrentPage, onLogout }) => {
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           <AnimatePresence mode="wait">
             <motion.div
-              key={currentPage} // Re-animate when page changes
+              key={location.pathname} // Re-animate when route changes
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              {content}
+              <Outlet />
             </motion.div>
           </AnimatePresence>
         </main>
